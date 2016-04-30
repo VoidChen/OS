@@ -14,15 +14,15 @@ class Matrix{
     public:
         int row;
         int col;
-        int **save;
+        double **save;
 
         // Init matrix
         Matrix(int row, int col, bool random_fill = false){
             this->row = row;
             this->col = col;
-            save = new int*[row];
+            save = new double*[row];
             for(int i = 0; i < row; ++i){
-                save[i] = new int[col];
+                save[i] = new double[col];
                 for(int j = 0; j < col; ++j){
                     save[i][j] = random_fill ? rand()%RANDOM_ELEMENT_MOD : 0;
                 }
