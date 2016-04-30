@@ -7,12 +7,14 @@
 #define RANDOM_ELEMENT_MOD 1000
 using namespace std;
 
+// Matrix class
 class Matrix{
     public:
         int row;
         int col;
         int **save;
 
+        // Init matrix
         Matrix(int row, int col, bool random_fill = false){
             this->row = row;
             this->col = col;
@@ -25,6 +27,7 @@ class Matrix{
             }
         }
 
+        // Print matrix
         void print(){
             for(int i = 0; i < row; ++i){
                 for(int j = 0; j < col; ++j)
@@ -60,10 +63,15 @@ void calc(Matrix *a, Matrix *b, Matrix *result, int row){
 Matrix* multiplication_mt(Matrix *a, Matrix *b){
     Matrix *result = new Matrix(a->row, b->col);
     thread *thread_list = new thread[a->row];
+
+    //Create thread
     for(int i = 0; i < a->row; ++i)
         thread_list[i] = thread(calc, a, b, result, i);
+
+    //Wait thread complete
     for(int i = 0; i < a->row; ++i)
         thread_list[i].join();
+
     return result;
 }
 
@@ -92,14 +100,14 @@ int main(){
     start = clock();
     R = addition(multiplication_st(M, N), multiplication_st(O, P));
     end = clock();
-    cout << "Single-thread approach Used time: " << fixed << (double)(end-start)/CLOCKS_PER_SEC << " second." <<endl;
+    cout << "Single-thread approach Used time: " << fixed << (double)(end-start)/CLOCKS_PER_SEC << " second." << endl;
 
     // Multiple-thread approach test
     start = clock();
     R = addition(multiplication_mt(M, N), multiplication_mt(O, P));
     end = clock();
-    cout << "Multiple-thread approach used time: " << fixed << (double)(end-start)/CLOCKS_PER_SEC << " second." <<endl;
+    cout << "Multiple-thread approach used time: " << fixed << (double)(end-start)/CLOCKS_PER_SEC << " second." << endl;
 
-    cout <<"Hardware thread contexts: " << thread::hardware_concurrency() <<endl;
+    cout << "Hardware thread contexts: " << thread::hardware_concurrency() << endl;
     return 0;
 }
