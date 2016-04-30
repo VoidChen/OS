@@ -1,8 +1,9 @@
 #include<iostream>
+#include<thread>
 #include<cstdlib>
 #include<ctime>
-#define ROWS 500
-#define COLS 1000
+#define ROWS 200
+#define COLS 10000
 #define RANDOM_ELEMENT_MOD 1000
 using namespace std;
 
@@ -31,10 +32,10 @@ class Matrix{
                 cout << endl;
             }
         }
-
 };
 
-Matrix* multiplication(Matrix *a, Matrix *b){
+// Matrix multiplication (Single-thread approach)
+Matrix* multiplication_st(Matrix *a, Matrix *b){
     Matrix *result = new Matrix(a->row, b->col);
     for(int i = 0; i < a->row; ++i){
         for(int j = 0; j < b->col; ++j){
@@ -46,6 +47,27 @@ Matrix* multiplication(Matrix *a, Matrix *b){
     return result;
 }
 
+// Calculate row
+void calc(Matrix *a, Matrix *b, Matrix *result, int row){
+    for(int i = 0; i < b->col; ++i){
+        result->save[row][i] = 0;
+        for(int j = 0; j < a->col; ++j)
+            result->save[row][i] += a->save[row][j] * b->save[j][i];
+    }
+}
+
+// Matrix multiplication (Multiple-thread approach)
+Matrix* multiplication_mt(Matrix *a, Matrix *b){
+    Matrix *result = new Matrix(a->row, b->col);
+    thread *thread_list = new thread[a->row];
+    for(int i = 0; i < a->row; ++i)
+        thread_list[i] = thread(calc, a, b, result, i);
+    for(int i = 0; i < a->row; ++i)
+        thread_list[i].join();
+    return result;
+}
+
+// Matrix addition
 Matrix* addition(Matrix *a, Matrix *b){
     Matrix *result = new Matrix(a->row, a->col);
     for(int i = 0; i < a->row; ++i){
@@ -55,22 +77,29 @@ Matrix* addition(Matrix *a, Matrix *b){
     return result;
 }
 
-
 int main(){
     srand(time(NULL));
+    clock_t start, end;
 
+    //Init matrix
     Matrix *M, *N, *O, *P, *R;
     M = new Matrix(ROWS, COLS, true);
     N = new Matrix(COLS, ROWS, true);
     O = new Matrix(ROWS, COLS, true);
     P = new Matrix(COLS, ROWS, true);
 
-    clock_t start, end;
+    // Single-thread approach test
     start = clock();
-    R = addition(multiplication(M, N), multiplication(O, P));
+    R = addition(multiplication_st(M, N), multiplication_st(O, P));
     end = clock();
+    cout << "Single-thread approach Used time: " << fixed << (double)(end-start)/CLOCKS_PER_SEC << " second." <<endl;
 
-    cout << "Used time: " << (double)(end-start)/CLOCKS_PER_SEC << " second." <<endl;
+    // Multiple-thread approach test
+    start = clock();
+    R = addition(multiplication_mt(M, N), multiplication_mt(O, P));
+    end = clock();
+    cout << "Multiple-thread approach used time: " << fixed << (double)(end-start)/CLOCKS_PER_SEC << " second." <<endl;
 
+    cout <<"Hardware thread contexts: " << thread::hardware_concurrency() <<endl;
     return 0;
 }
