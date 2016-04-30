@@ -2,10 +2,12 @@
 #include<thread>
 #include<cstdlib>
 #include<ctime>
+#include<chrono>
 #define ROWS 200
 #define COLS 10000
 #define RANDOM_ELEMENT_MOD 1000
 using namespace std;
+using namespace std::chrono;
 
 // Matrix class
 class Matrix{
@@ -87,7 +89,7 @@ Matrix* addition(Matrix *a, Matrix *b){
 
 int main(){
     srand(time(NULL));
-    clock_t start, end;
+    high_resolution_clock::time_point start, end;
 
     //Init matrix
     Matrix *M, *N, *O, *P, *R;
@@ -97,16 +99,16 @@ int main(){
     P = new Matrix(COLS, ROWS, true);
 
     // Single-thread approach test
-    start = clock();
+    start = high_resolution_clock::now();
     R = addition(multiplication_st(M, N), multiplication_st(O, P));
-    end = clock();
-    cout << "Single-thread approach Used time: " << fixed << (double)(end-start)/CLOCKS_PER_SEC << " second." << endl;
+    end = high_resolution_clock::now();
+    cout << "Single-thread approach Used time: " << fixed << duration_cast<duration<double>>(end-start).count() << " second." << endl;
 
     // Multiple-thread approach test
-    start = clock();
+    start = high_resolution_clock::now();
     R = addition(multiplication_mt(M, N), multiplication_mt(O, P));
-    end = clock();
-    cout << "Multiple-thread approach used time: " << fixed << (double)(end-start)/CLOCKS_PER_SEC << " second." << endl;
+    end = high_resolution_clock::now();
+    cout << "Multiple-thread approach used time: " << fixed << duration_cast<duration<double>>(end-start).count() << " second." << endl;
 
     cout << "Hardware thread contexts: " << thread::hardware_concurrency() << endl;
     return 0;
