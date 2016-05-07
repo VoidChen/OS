@@ -100,14 +100,12 @@ int main(){
     start = high_resolution_clock::now();
     R = addition(multiplication_st(M, N), multiplication_st(O, P));
     end = high_resolution_clock::now();
-    cout << "Single-thread approach Used time: " << fixed << duration_cast<duration<double>>(end-start).count() << " second." << endl;
+    cout << "Single-thread approach used time: " << fixed << duration_cast<duration<double>>(end-start).count() << " second." << endl;
 
     // Multiple-thread approach test
     start = high_resolution_clock::now();
     R = addition(multiplication_mt(M, N), multiplication_mt(O, P));
     end = high_resolution_clock::now();
     cout << "Multiple-thread approach used time: " << fixed << duration_cast<duration<double>>(end-start).count() << " second." << endl;
-
-    cout << "Hardware thread contexts: " << thread::hardware_concurrency() << endl;
     return 0;
 }
