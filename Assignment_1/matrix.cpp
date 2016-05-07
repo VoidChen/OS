@@ -1,8 +1,11 @@
-#include<iostream>
-#include<thread>
-#include<cstdlib>
-#include<ctime>
-#include<chrono>
+/*
+ * Operating Systems Programming Assignment 1
+ */
+#include <iostream>
+#include <thread>
+#include <cstdlib>
+#include <ctime>
+#include <chrono>
 #define ROWS 200
 #define COLS 10000
 using namespace std;
@@ -107,5 +110,6 @@ int main(){
     R = addition(multiplication_mt(M, N), multiplication_mt(O, P));
     end = high_resolution_clock::now();
     cout << "Multiple-thread approach execution time: " << fixed << duration_cast<duration<double>>(end-start).count() << " seconds." << endl;
+
     return 0;
 }
