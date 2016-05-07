@@ -5,7 +5,6 @@
 #include<chrono>
 #define ROWS 200
 #define COLS 10000
-#define RANDOM_ELEMENT_MOD 1000
 using namespace std;
 using namespace std::chrono;
 
@@ -16,16 +15,15 @@ class Matrix{
         int col;
         double **save;
 
-        // Init matrix
+        // Initial matrix
         Matrix(int row, int col, bool random_fill = false){
             this->row = row;
             this->col = col;
             save = new double*[row];
             for(int i = 0; i < row; ++i){
                 save[i] = new double[col];
-                for(int j = 0; j < col; ++j){
-                    save[i][j] = random_fill ? rand()%RANDOM_ELEMENT_MOD : 0;
-                }
+                for(int j = 0; j < col; ++j)
+                    save[i][j] = random_fill ? (double)rand()/RAND_MAX : 0;
             }
         }
 
@@ -33,7 +31,7 @@ class Matrix{
         void print(){
             for(int i = 0; i < row; ++i){
                 for(int j = 0; j < col; ++j)
-                    cout << save[i][j] <<" ";
+                    cout << save[i][j] << " ";
                 cout << endl;
             }
         }
@@ -91,7 +89,7 @@ int main(){
     srand(time(NULL));
     high_resolution_clock::time_point start, end;
 
-    //Init matrix
+    //Initial matrix
     Matrix *M, *N, *O, *P, *R;
     M = new Matrix(ROWS, COLS, true);
     N = new Matrix(COLS, ROWS, true);
