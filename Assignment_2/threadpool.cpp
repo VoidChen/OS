@@ -3,6 +3,7 @@
  * Thread Pool
  */
 #include <iostream>
+#include <unistd.h>
 #include <vector>
 #include <thread>
 #include <mutex>
@@ -85,9 +86,8 @@ class Pool{
         Pool(int size){
             this->size = size;
             thread_list = new thread[size];
-            for(int i = 0; i < size; ++i){
+            for(int i = 0; i < size; ++i)
                 thread_list[i] = thread(loop_run, this);
-            }
         }
 
         int submit(Job newjob){
@@ -126,17 +126,16 @@ class Star: public Job{
             cout << endl;
         }
 
-        void set_size(int n){
+        Star(int n){
             size = n;
         }
 };
 
 int main(){
     Pool *pool = new Pool(4);
-    Star slist[10];
-    for(int i = 0; i < 10; ++i){
-        slist[i].set_size(i+1);
-        pool->submit(slist[i]);
-    }
+    for(int i = 0; i < 10; ++i)
+        pool->submit(Star(i));
+    for(int i = 0; i < 10; ++i)
+        pool->job_join(i);
     return 0;
 }
