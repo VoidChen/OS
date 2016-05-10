@@ -1,5 +1,6 @@
 /*
- * Operating Systems Programming Assignment 1
+ * Operating Systems Programming Assignment 2
+ * Matrix
  */
 #include <iostream>
 #include <cstdlib>
