@@ -10,8 +10,6 @@
 #include <condition_variable>
 using namespace std;
 
-mutex cout_lock;
-
 class Job{
     friend class Job_List;
 
@@ -22,8 +20,6 @@ class Job{
         int id;
 
         virtual void run(){
-            lock_guard<mutex> list_guard(cout_lock);
-            cout << "Job " << id << endl;
         }
 
         Job(){
@@ -114,31 +110,4 @@ void loop_run(Pool *pool){
         job->run();
         pool->set_complete(job->id);
     }
-}
-
-mutex star_mutex;
-
-class Star: public Job{
-    public:
-        int size;
-
-        void run(){
-            lock_guard<mutex> lock(star_mutex);
-            for(int i = 0; i < size; ++i)
-                cout << '*';
-            cout << endl;
-        }
-
-        Star(int n){
-            size = n;
-        }
-};
-
-int main(){
-    Pool *pool = new Pool(4);
-    for(int i = 0; i < 10; ++i)
-        pool->submit(new Star(i));
-    for(int i = 0; i < 10; ++i)
-        pool->job_join(i);
-    return 0;
 }
