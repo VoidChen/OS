@@ -6,7 +6,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <chrono>
-#include "threadpool.cpp"
+#include "threadpool.h"
 #define ROWS 500
 #define COLS 1000
 using namespace std;

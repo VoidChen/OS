@@ -3,7 +3,6 @@
  * Thread Pool
  */
 #include <iostream>
-#include <unistd.h>
 #include <vector>
 #include <thread>
 #include <mutex>
