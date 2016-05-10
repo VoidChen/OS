@@ -34,7 +34,7 @@ class Job{
 
 class Job_List{
     private:
-        vector<Job> list;
+        vector<Job*> list;
         unsigned int ready_flag;
         mutex list_mutex;
         condition_variable wait_job;
@@ -45,31 +45,31 @@ class Job_List{
             ready_flag = 0;
         }
 
-        int append(Job job){
+        int append(Job *job){
             lock_guard<mutex> list_guard(list_mutex);
             list.push_back(job);
-            list.back().id = list.size()-1;
+            list.back()->id = list.size()-1;
             wait_job.notify_all();
-            return list.back().id;
+            return list.back()->id;
         }
 
         void join(int job_id){
             unique_lock<mutex> lock(list_mutex);
-            while(list[job_id].status != "COMPLETE")
+            while(list[job_id]->status != "COMPLETE")
                 wait_complete.wait(lock);
         }
 
-        Job get_job(){
+        Job* get_job(){
             unique_lock<mutex> lock(list_mutex);
             while(ready_flag == list.size())
                 wait_job.wait(lock);
-            list[ready_flag].status = "RUNNING";
+            list[ready_flag]->status = "RUNNING";
             return list[ready_flag++];
         }
 
         void set_complete(int job_id){
             lock_guard<mutex> list_guard(list_mutex);
-            list[job_id].status = "COMPLETE";
+            list[job_id]->status = "COMPLETE";
             wait_complete.notify_all();
         }
 };
@@ -90,7 +90,7 @@ class Pool{
                 thread_list[i] = thread(loop_run, this);
         }
 
-        int submit(Job newjob){
+        int submit(Job *newjob){
             return job_list.append(newjob);
         }
 
@@ -98,7 +98,7 @@ class Pool{
             job_list.join(job_id);
         }
 
-        Job get_job(){
+        Job* get_job(){
             return job_list.get_job();
         }
 
@@ -108,19 +108,22 @@ class Pool{
 };
 
 void loop_run(Pool *pool){
-    Job job;
+    Job *job;
     while(true){
         job = pool->get_job();
-        job.run();
-        pool->set_complete(job.id);
+        job->run();
+        pool->set_complete(job->id);
     }
 }
+
+mutex star_mutex;
 
 class Star: public Job{
     public:
         int size;
 
         void run(){
+            lock_guard<mutex> lock(star_mutex);
             for(int i = 0; i < size; ++i)
                 cout << '*';
             cout << endl;
@@ -134,7 +137,7 @@ class Star: public Job{
 int main(){
     Pool *pool = new Pool(4);
     for(int i = 0; i < 10; ++i)
-        pool->submit(Star(i));
+        pool->submit(new Star(i));
     for(int i = 0; i < 10; ++i)
         pool->job_join(i);
     return 0;
