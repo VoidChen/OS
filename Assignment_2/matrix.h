@@ -81,11 +81,11 @@ Matrix* multiplication_mt(Matrix *a, Matrix *b){
     //Create thread pool
     Pool *pool = new Pool(4);
 
-    //Submit Job
+    //Submit jobs
     for(int i = 0; i < a->row; ++i)
         pool->submit(new CalcRow(a, b, result, i));
 
-    //Wait thread complete
+    //Wait jobs complete
     for(int i = 0; i < a->row; ++i)
         pool->job_join(i);
 
