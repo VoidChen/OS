@@ -10,7 +10,7 @@
 using namespace std;
 
 class Job{
-    friend class Job_List;
+    friend class Pool;
 
     private:
         string status;
@@ -27,78 +27,66 @@ class Job{
         }
 };
 
-class Job_List{
-    private:
-        vector<Job*> list;
-        unsigned int ready_flag;
-        mutex list_mutex;
-        condition_variable wait_job;
-        condition_variable wait_complete;
-
-    public:
-        Job_List(){
-            ready_flag = 0;
-        }
-
-        int append(Job *job){
-            lock_guard<mutex> list_guard(list_mutex);
-            list.push_back(job);
-            list.back()->id = list.size()-1;
-            wait_job.notify_all();
-            return list.back()->id;
-        }
-
-        void join(int job_id){
-            unique_lock<mutex> lock(list_mutex);
-            while(list[job_id]->status != "COMPLETE")
-                wait_complete.wait(lock);
-        }
-
-        Job* get_job(){
-            unique_lock<mutex> lock(list_mutex);
-            while(ready_flag == list.size())
-                wait_job.wait(lock);
-            list[ready_flag]->status = "RUNNING";
-            return list[ready_flag++];
-        }
-
-        void set_complete(int job_id){
-            lock_guard<mutex> list_guard(list_mutex);
-            list[job_id]->status = "COMPLETE";
-            wait_complete.notify_all();
-        }
-};
-
 class Pool;
 void loop_run(Pool *pool);
 
 class Pool{
-    public:
-        int size;
+    private:
+        int thread_pool_size;
         thread *thread_list;
-        Job_List job_list;
 
-        Pool(int size){
-            this->size = size;
-            thread_list = new thread[size];
-            for(int i = 0; i < size; ++i)
+        vector<Job*> job_list;
+        unsigned int job_ready_flag;
+        mutex job_list_mutex;
+
+        condition_variable wait_job;
+        condition_variable wait_complete;
+
+        //Create threads
+        void create_thread(){
+            thread_list = new thread[thread_pool_size];
+            for(int i = 0; i < thread_pool_size; ++i)
                 thread_list[i] = thread(loop_run, this);
         }
 
-        int submit(Job *newjob){
-            return job_list.append(newjob);
+    public:
+        //Initial thread pool
+        Pool(int size){
+            thread_pool_size = size;
+            job_ready_flag = 0;
+            create_thread();
         }
 
+        //Submit new job
+        int submit(Job *job){
+            lock_guard<mutex> job_list_guard(job_list_mutex);
+            job_list.push_back(job);
+            job_list.back()->id = job_list.size()-1;
+            wait_job.notify_all();
+            return job_list.back()->id;
+        }
+
+        //Wait job complete
         void job_join(int job_id){
-            job_list.join(job_id);
+            unique_lock<mutex> lock(job_list_mutex);
+            while(job_list[job_id]->status != "COMPLETE")
+                wait_complete.wait(lock);
         }
 
+        //Thread get job
         Job* get_job(){
-            return job_list.get_job();
+            unique_lock<mutex> lock(job_list_mutex);
+            while(job_ready_flag == job_list.size())
+                wait_job.wait(lock);
+            job_list[job_ready_flag]->status = "RUNNING";
+            return job_list[job_ready_flag++];
         }
 
+        //Thread complete job
         void set_complete(int job_id){
-            job_list.set_complete(job_id);
+            lock_guard<mutex> job_list_guard(job_list_mutex);
+            job_list[job_id]->status = "COMPLETE";
+            wait_complete.notify_all();
         }
 };
 
