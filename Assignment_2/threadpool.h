@@ -51,7 +51,7 @@ class Pool{
 
     public:
         //Initial thread pool
-        Pool(int size){
+        Pool(int size = 4){
             thread_pool_size = size;
             job_ready_flag = 0;
             create_thread();
