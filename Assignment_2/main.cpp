@@ -16,7 +16,7 @@ int main(){
     srand(time(NULL));
     high_resolution_clock::time_point start, end;
 
-    //Initial matrix
+    // Initial matrix
     Matrix *M, *N, *O, *P, *R;
     M = new Matrix(ROWS, COLS, true);
     N = new Matrix(COLS, ROWS, true);

@@ -1,6 +1,6 @@
 /*
  * Operating Systems Programming Assignment 2
- * Thread Pool
+ * Thread Pool (threadpool.h)
  */
 #include <string>
 #include <vector>
@@ -9,6 +9,7 @@
 #include <condition_variable>
 using namespace std;
 
+// Job class
 class Job{
     friend class Pool;
 
@@ -21,6 +22,7 @@ class Job{
         virtual void run(){
         }
 
+        // Initial job
         Job(){
             id = 0;
             status = "READY";
@@ -30,6 +32,7 @@ class Job{
 class Pool;
 void loop_run(Pool *pool);
 
+// Thread pool class
 class Pool{
     private:
         int thread_pool_size;
@@ -42,7 +45,7 @@ class Pool{
         condition_variable wait_job;
         condition_variable wait_complete;
 
-        //Create threads
+        // Create threads
         void create_thread(){
             thread_list = new thread[thread_pool_size];
             for(int i = 0; i < thread_pool_size; ++i)
@@ -50,14 +53,14 @@ class Pool{
         }
 
     public:
-        //Initial thread pool
+        // Initial thread pool
         Pool(int size = 4){
             thread_pool_size = size;
             job_ready_flag = 0;
             create_thread();
         }
 
-        //Submit new job
+        // Submit new job
         int submit(Job *job){
             lock_guard<mutex> job_list_guard(job_list_mutex);
             job_list.push_back(job);
@@ -66,14 +69,14 @@ class Pool{
             return job_list.back()->id;
         }
 
-        //Wait job complete
+        // Wait job complete
         void job_join(int job_id){
             unique_lock<mutex> lock(job_list_mutex);
             while(job_list[job_id]->status != "COMPLETE")
                 wait_complete.wait(lock);
         }
 
-        //Thread get job
+        // Thread get job
         Job* get_job(){
             unique_lock<mutex> lock(job_list_mutex);
             while(job_ready_flag == job_list.size())
@@ -82,7 +85,7 @@ class Pool{
             return job_list[job_ready_flag++];
         }
 
-        //Thread complete job
+        // Thread complete job
         void set_complete(int job_id){
             lock_guard<mutex> job_list_guard(job_list_mutex);
             job_list[job_id]->status = "COMPLETE";
@@ -90,6 +93,7 @@ class Pool{
         }
 };
 
+// Thread loop
 void loop_run(Pool *pool){
     Job *job;
     while(true){

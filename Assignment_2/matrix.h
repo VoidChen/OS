@@ -1,6 +1,6 @@
 /*
  * Operating Systems Programming Assignment 2
- * Matrix
+ * Matrix (matrix.h)
  */
 #include <iostream>
 #include <cstdlib>
@@ -49,7 +49,7 @@ Matrix* multiplication_st(Matrix *a, Matrix *b){
     return result;
 }
 
-// Calculate row
+// Calculate row class
 class CalcRow: public Job{
     private:
         Matrix *a;
@@ -58,6 +58,7 @@ class CalcRow: public Job{
         int row;
 
     public:
+        // Initial class
         CalcRow(Matrix *a, Matrix *b, Matrix *result, int row){
             this->a = a;
             this->b = b;
@@ -65,6 +66,7 @@ class CalcRow: public Job{
             this->row = row;
         }
 
+        // Calculate result
         void run(){
             for(int i = 0; i < b->col; ++i){
                 result->save[row][i] = 0;
@@ -78,14 +80,14 @@ class CalcRow: public Job{
 Matrix* multiplication_mt(Matrix *a, Matrix *b, int thread_pool_size = 4){
     Matrix *result = new Matrix(a->row, b->col);
 
-    //Create thread pool
+    // Create thread pool
     Pool *pool = new Pool(thread_pool_size);
 
-    //Submit jobs
+    // Submit jobs
     for(int i = 0; i < a->row; ++i)
         pool->submit(new CalcRow(a, b, result, i));
 
-    //Wait jobs complete
+    // Wait jobs complete
     for(int i = 0; i < a->row; ++i)
         pool->job_join(i);
 
