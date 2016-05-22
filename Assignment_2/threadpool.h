@@ -1,6 +1,6 @@
 /*
  * Operating Systems Programming Assignment 2
- * Thread Pool (threadpool.h)
+ * Thread ThreadPool (threadpool.h)
  */
 #include <string>
 #include <vector>
@@ -11,7 +11,7 @@ using namespace std;
 
 // Job class
 class Job{
-    friend class Pool;
+    friend class ThreadPool;
 
     private:
         string status;
@@ -29,11 +29,11 @@ class Job{
         }
 };
 
-class Pool;
-void loop_run(Pool *pool);
+class ThreadPool;
+void loop_run(ThreadPool *pool);
 
 // Thread pool class
-class Pool{
+class ThreadPool{
     private:
         int thread_pool_size;
         thread *thread_list;
@@ -54,7 +54,7 @@ class Pool{
 
     public:
         // Initial thread pool
-        Pool(int size = 4){
+        ThreadPool(int size = 4){
             thread_pool_size = size;
             job_ready_flag = 0;
             create_thread();
@@ -94,7 +94,7 @@ class Pool{
 };
 
 // Thread loop
-void loop_run(Pool *pool){
+void loop_run(ThreadPool *pool){
     Job *job;
     while(true){
         job = pool->get_job();
