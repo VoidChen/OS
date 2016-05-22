@@ -1,6 +1,6 @@
 /*
  * Operating Systems Programming Assignment 2
- * Thread ThreadPool (threadpool.h)
+ * Thread Pool (threadpool.h)
  */
 #include <string>
 #include <vector>

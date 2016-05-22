@@ -49,7 +49,7 @@ Matrix* multiplication_st(Matrix *a, Matrix *b){
     return result;
 }
 
-// Calculate row class
+// Calculate row
 class CalcRow: public Job{
     private:
         Matrix *a;
