@@ -16,7 +16,7 @@ int main(){
     srand(time(NULL));
     high_resolution_clock::time_point start, end;
 
-    //Initial matrix
+    // Initial matrix
     Matrix *M, *N, *O, *P, *R;
     M = new Matrix(ROWS, COLS, true);
     N = new Matrix(COLS, ROWS, true);
@@ -27,13 +27,13 @@ int main(){
     start = high_resolution_clock::now();
     R = addition(multiplication_st(M, N), multiplication_st(O, P));
     end = high_resolution_clock::now();
-    cout << "Single-thread approach execution time: " << fixed << duration_cast<duration<double>>(end-start).count() << " seconds." << endl;
+    cout << "Single-thread approach execution time: " << fixed << duration<double>(end-start).count() << " seconds." << endl;
 
     // Multiple-thread approach test
     start = high_resolution_clock::now();
     R = addition(multiplication_mt(M, N), multiplication_mt(O, P));
     end = high_resolution_clock::now();
-    cout << "Multiple-thread approach execution time: " << fixed << duration_cast<duration<double>>(end-start).count() << " seconds." << endl;
+    cout << "Multiple-thread approach execution time: " << fixed << duration<double>(end-start).count() << " seconds." << endl;
 
     return 0;
 }
