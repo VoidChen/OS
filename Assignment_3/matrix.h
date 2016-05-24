@@ -67,7 +67,7 @@ class CalcRow: public Job{
         }
 
         // Calculate result
-        void run(){
+        void run() override{
             for(int i = 0; i < b->col; ++i){
                 result->save[row][i] = 0;
                 for(int j = 0; j < a->col; ++j)

@@ -18,9 +18,7 @@ class Job{
 
     public:
         int id;
-
-        virtual void run(){
-        }
+        virtual void run() = 0;
 
         // Initial job
         Job(){
