@@ -77,7 +77,7 @@ class CalcRow: public Job{
 };
 
 // Matrix multiplication (Multiple-thread approach)
-Matrix* multiplication_mt(Matrix *a, Matrix *b, int thread_pool_size = 4){
+Matrix* multiplication_mt(Matrix *a, Matrix *b, unsigned int thread_pool_size = 4){
     Matrix *result = new Matrix(a->row, b->col);
 
     // Create thread pool

@@ -17,7 +17,7 @@ class Job{
         string status;
 
     public:
-        int id;
+        unsigned int id;
         virtual void run() = 0;
 
         // Initial job
@@ -33,7 +33,7 @@ void loop_run(ThreadPool *pool);
 // Thread pool class
 class ThreadPool{
     private:
-        int thread_pool_size;
+        unsigned int thread_pool_size;
         thread *thread_list;
 
         vector<Job*> job_list;
@@ -52,14 +52,14 @@ class ThreadPool{
 
     public:
         // Initial thread pool
-        ThreadPool(int size = 4){
-            thread_pool_size = size;
+        ThreadPool(unsigned int size = thread::hardware_concurrency()){
+            thread_pool_size = size ? size : 1;
             job_ready_flag = 0;
             create_thread();
         }
 
         // Submit new job
-        int submit(Job *job){
+        unsigned int submit(Job *job){
             lock_guard<mutex> job_list_guard(job_list_mutex);
             job_list.push_back(job);
             job_list.back()->id = job_list.size()-1;
@@ -68,7 +68,7 @@ class ThreadPool{
         }
 
         // Wait job complete
-        void job_join(int job_id){
+        void job_join(unsigned int job_id){
             unique_lock<mutex> lock(job_list_mutex);
             while(job_list[job_id]->status != "COMPLETE")
                 wait_complete.wait(lock);
@@ -84,7 +84,7 @@ class ThreadPool{
         }
 
         // Thread complete job
-        void set_complete(int job_id){
+        void set_complete(unsigned int job_id){
             lock_guard<mutex> job_list_guard(job_list_mutex);
             job_list[job_id]->status = "COMPLETE";
             wait_complete.notify_all();
