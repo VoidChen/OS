@@ -2,7 +2,6 @@
  * Operating Systems Programming Assignment 3
  * Thread Pool (threadpool.h)
  */
-#include <string>
 #include <vector>
 #include <thread>
 #include <mutex>
@@ -14,7 +13,8 @@ class Job{
     friend class ThreadPool;
 
     private:
-        string status;
+        enum JobStatus {READY, RUNNING, COMPLETE};
+        JobStatus status;
 
     public:
         unsigned int id;
@@ -23,7 +23,7 @@ class Job{
         // Initial job
         Job(){
             id = 0;
-            status = "READY";
+            status = READY;
         }
 };
 
@@ -70,7 +70,7 @@ class ThreadPool{
         // Wait job complete
         void job_join(unsigned int job_id){
             unique_lock<mutex> lock(job_list_mutex);
-            while(job_list[job_id]->status != "COMPLETE")
+            while(job_list[job_id]->status != Job::COMPLETE)
                 wait_complete.wait(lock);
         }
 
@@ -79,14 +79,14 @@ class ThreadPool{
             unique_lock<mutex> lock(job_list_mutex);
             while(job_ready_flag == job_list.size())
                 wait_job.wait(lock);
-            job_list[job_ready_flag]->status = "RUNNING";
+            job_list[job_ready_flag]->status = Job::RUNNING;
             return job_list[job_ready_flag++];
         }
 
         // Thread complete job
         void set_complete(unsigned int job_id){
             lock_guard<mutex> job_list_guard(job_list_mutex);
-            job_list[job_id]->status = "COMPLETE";
+            job_list[job_id]->status = Job::COMPLETE;
             wait_complete.notify_all();
         }
 };
